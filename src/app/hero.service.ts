@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Hero} from './hero';
-import {Http} from '@angular/http';
+import {Headers, Http, Response} from '@angular/http';
 
 @Injectable()
 export class HeroService {
@@ -12,7 +12,7 @@ export class HeroService {
   getHeroes(): Promise<Hero[]> {
     return this.http.get(this.heroesUrl)
       .toPromise()
-      .then(response => response.json()as Hero[])
+      .then((response: Response) => response.json() as Hero[])
       .catch(this.handleError);
   }
 
@@ -21,7 +21,24 @@ export class HeroService {
     const url = `${this.heroesUrl}/${id}`;
     return this.http.get(url)
       .toPromise()
-      .then(response => response.json() as Hero)
+      .then((response: Response) => response.json() as Hero)
+      .catch(this.handleError);
+  }
+
+  update(hero: Hero): Promise<Hero> {
+    const url = `${this.heroesUrl}/${hero.id}`;
+    return this.http
+      .put(url, JSON.stringify(hero), {headers: this.headers})
+      .toPromise()
+      .then(() => hero)
+      .catch(this.handleError);
+  }
+
+  create(name: string): Promise<Hero> {
+    return this.http
+      .post(this.heroesUrl, JSON.stringify({name: name}), {headers: this.headers})
+      .toPromise()
+      .then((res: Response) => res.json() as Hero)
       .catch(this.handleError);
   }
 
